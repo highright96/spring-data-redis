@@ -32,7 +32,7 @@ public class PerformanceAspect {
 
     //종료 후
     stopWatch.stop();
-    log.info("Perform : [{}] {}ms", methodName, stopWatch.getLastTaskTimeMillis());
+    log.info("Perform : [{}] {}ns", methodName, stopWatch.getLastTaskTimeNanos());
 
     return result;
   }

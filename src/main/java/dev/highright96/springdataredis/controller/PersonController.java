@@ -1,20 +1,21 @@
 package dev.highright96.springdataredis.controller;
 
 import dev.highright96.springdataredis.aop.Timer;
+import dev.highright96.springdataredis.domain.Address;
 import dev.highright96.springdataredis.domain.Person;
 import dev.highright96.springdataredis.domain.PersonRedis;
 import dev.highright96.springdataredis.repository.PersonRedisRepository;
 import dev.highright96.springdataredis.repository.PersonRepository;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/person")
@@ -23,14 +24,23 @@ public class PersonController {
   private final PersonRepository personRepository;
   private final PersonRedisRepository personRedisRepository;
 
-  @PostMapping
-  public ResponseEntity<Long> createPerson() {
-    Person person = new Person(null, "상우", "남", "서울특별시 강동구");
+  //@PostConstruct
+  public ResponseEntity<Void> createPerson() {
+    List<Person> personList = new ArrayList<>();
+    List<PersonRedis> personRedisList = new ArrayList<>();
+    for (int i = 1; i <= 100000; i++) {
+      Address address = new Address("서울특별시", "대한민국");
+      Person person = new Person(null, "상우 " + i, "남", address);
+      personList.add(person);
+    }
     // DB 에 저장
-    Person savedPerson = personRepository.save(person);
+    List<Person> savedPersonList = personRepository.saveAll(personList);
     // cache 에 저장
-    personRedisRepository.save(PersonRedis.create(savedPerson));
-    return ResponseEntity.ok(savedPerson.getId());
+    for (Person person : savedPersonList) {
+      personRedisList.add(PersonRedis.createPersonExp(person, 300L));
+    }
+    personRedisRepository.saveAll(personRedisList);
+    return ResponseEntity.ok().build();
   }
 
   @Timer

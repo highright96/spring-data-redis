@@ -4,7 +4,7 @@ spring:
     port: 6379
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       format_sql: true
   datasource:

@@ -1,5 +1,6 @@
 package dev.highright96.springdataredis.domain;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,9 +19,11 @@ public class Person {
   Long id;
   String firstname;
   String lastname;
-  String address;
 
-  public Person(Long id, String firstname, String lastname, String address) {
+  @Embedded
+  Address address;
+
+  public Person(Long id, String firstname, String lastname, Address address) {
     this.id = id;
     this.firstname = firstname;
     this.lastname = lastname;
